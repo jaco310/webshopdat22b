@@ -75,8 +75,14 @@ public class ProductRepository {
             String name = product.getName();
             double price = product.getPrice();
             int id = product.getId();
+            preparedStatement.setString(1,name);
+            preparedStatement.setDouble(2,price);
+            preparedStatement.setInt(3,id);
 
             //execute statement
+            preparedStatement.executeUpdate();
+
+
         }catch (SQLException e) {
             System.out.println("Could not update product");
             e.printStackTrace();

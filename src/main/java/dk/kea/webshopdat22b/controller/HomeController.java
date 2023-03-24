@@ -44,4 +44,5 @@ public class HomeController {
         //tilbage til produktlisten
         return "redirect:/";
     }
+    
 }
