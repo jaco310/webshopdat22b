@@ -1,6 +1,7 @@
 package dk.kea.webshopdat22b.repository;
 
 import dk.kea.webshopdat22b.model.Product;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
@@ -10,10 +11,20 @@ import java.util.List;
 @Repository
 public class ProductRepository {
 
-    //database-properties
-    private final String DB_URL = "jdbc:mysql://localhost:3306/webshopdat22b";
-    private final String UID = "root";
-    private final String PWD = "qJiw03K2zwJD";
+
+    @Value("${spring.datasource.url}")
+    private String DB_URL;
+
+    @Value("${spring.datasource.username}")
+    private String UID;
+
+    @Value("${spring.datasource.password}")
+    private String PWD;
+
+   //database-properties
+   // private final String DB_URL = "jdbc:mysql://localhost:3306/webshopdat22b";
+   // private final String UID = "root";
+   // private final String PWD = "Gris09876";
 
     public List<Product> getAll(){
         List<Product> productList = new ArrayList<>();
@@ -88,6 +99,55 @@ public class ProductRepository {
             e.printStackTrace();
         }
 
+    }
+    public Product findProductById(int id){
+        //SQL-Statement
+        final String FIND_QUERY = "SELECT * FROM products WHERE id = ?";
+        Product product = new Product();
+        product.setId(id);
+
+        try {
+            //db connection
+            Connection connection = DriverManager.getConnection(DB_URL,UID,PWD);
+            //prepared statement
+            PreparedStatement preparedStatement = connection.prepareStatement(FIND_QUERY);
+
+            //set parameters
+            preparedStatement.setInt(1,id);
+
+            //execute statment
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            //få produkt ud af resultatet
+            resultSet.next();
+            String name = resultSet.getString(2);
+            double price = resultSet.getDouble(3);
+            product.setName(name);
+            product.setPrice(price);
+
+        }catch (SQLException e){
+            System.out.println("Could not find product");
+            e.printStackTrace();
+        }
+        //return product
+        return product;
+    }
+    public void deleteById(int id){
+        //SQL-query
+        final String DELETE_QUERY = "DELETE FROM products WHERE id=?";
+        try {
+            //connect til db
+            Connection connection = DriverManager.getConnection(DB_URL, UID, PWD);
+            //create statement
+            PreparedStatement preparedStatement = connection.prepareStatement(DELETE_QUERY);
+            //set parameter
+            preparedStatement.setInt(1,id);
+            //execute statement
+            preparedStatement.executeUpdate();
+        }catch (SQLException e){
+            System.out.println("Could not delete product");
+            e.printStackTrace();
+        }
     }
 }
 
